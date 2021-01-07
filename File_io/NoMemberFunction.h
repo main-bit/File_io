@@ -156,4 +156,11 @@ namespace Lin
 	///		LReadFileAll(pFile);
 	///	</example>
 	void LReadFileAll(Lin::LFile*, std::ios_base::openmode = std::ios::in);
+	/// <summary>
+	/// 读取全部内容，放入vector容器中
+	/// </summary>
+	/// <param name="">文件指针</param>
+	/// <param name="">vector容器</param>
+	/// <param name="">打开方式</param>
+	void LReadFileAll(Lin::LFile*, std::vector<std::string>&, std::ios_base::openmode = std::ios::in);
 }

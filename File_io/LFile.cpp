@@ -326,7 +326,6 @@ const string LDate::ToNormString() const
 
 #pragma region LFile类实现
 map<string, LFile*> LFile::g_FilePool;
-unsigned int LFile::g_len = 1;
 
 LFile::LFile(const string& _FileName) :m_FileName(_FileName) { }
 LFile::~LFile() { }
@@ -339,9 +338,10 @@ void LFile::BeginRead(LFile* _pFile, ios_base::openmode _Mode)
 			_pFile->m_I = auto_ptr<ifstream>(new ifstream(_pFile->m_FileName, _Mode));
 		if (!*_pFile->m_I.get())
 			throw L"ErrorOpen!\n";
-		LFile::g_len = 1;
+		_pFile->m_thislen = 1;
 	}
 	catch (const wchar_t* _tch) { OutputDebugString(_tch); throw L"ErrorOpen!\n"; }
+	catch (...) { throw L"发送其他异常！\n"; }
 }
 void LFile::BeginWrite(LFile* _pFile, ios_base::openmode _Mode)
 {
@@ -353,8 +353,9 @@ void LFile::BeginWrite(LFile* _pFile, ios_base::openmode _Mode)
 			throw L"ErrorOpen!\n";
 	}
 	catch (const wchar_t* _tch) { OutputDebugString(_tch); }
+	catch (...) { throw L"发生其他异常！\n"; }
 }
-void LFile::EndRead(LFile* _pFile) { _pFile->m_I->close(); _pFile->m_I.reset(); LFile::g_len = 1; }
+void LFile::EndRead(LFile* _pFile) { _pFile->m_I->close(); _pFile->m_I.reset(); _pFile->m_thislen = 1; }
 void LFile::EndWrite(LFile* _pFile) { _pFile->m_O->close(); _pFile->m_O.reset(); }
 
 void LFile::Write(const string& _Info, ios_base::openmode _Mode)
@@ -369,7 +370,7 @@ void LFile::Write(const string& _Info, ios_base::openmode _Mode)
 string LFile::Read(unsigned int _len, ios_base::openmode _Mode)
 {
 	if (_len == 0)	ReadAll(_Mode);
-	if (_len < g_len)
+	if (_len < m_thislen)
 	{
 		LFile::EndRead(this);
 		LFile::BeginRead(this, _Mode);
@@ -377,22 +378,35 @@ string LFile::Read(unsigned int _len, ios_base::openmode _Mode)
 	char str[256];
 	while (m_I->getline(str, 256, '\n'))
 	{
-		if (g_len == _len)
+		if (m_thislen == _len)
 		{
-			++g_len;
+			++m_thislen;
 			break;
 		}
-		++g_len;
+		++m_thislen;
 	}
 	return str;
 }
 
-void LFile::ReadAll(std::ios_base::openmode _Mode)
+void LFile::ReadAll(ios_base::openmode _Mode)
 {
 	BeginRead(this, _Mode);
 	char str[256];
 	while (m_I->getline(str, 256, '\n'))
+	{
 		cout << str << endl;
+	}
+	EndRead(this);
+}
+
+void LFile::ReadAll(vector<string>& List, ios_base::openmode Mode)
+{
+	BeginRead(this, Mode);
+	char str[256];
+	while (m_I->getline(str, 256, '\n'))
+	{
+		List.push_back(str);
+	}
 	EndRead(this);
 }
 

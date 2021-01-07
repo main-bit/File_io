@@ -45,7 +45,11 @@ string Lin::LReadFileLinePlus(Lin::LFile* _pFile, unsigned int _len, ios_base::o
 	return _pFile->Read(_len, _Mode);
 }
 
-void Lin::LReadFileAll(Lin::LFile* _pFile, std::ios_base::openmode _Mode)
+void Lin::LReadFileAll(LFile* _pFile, ios_base::openmode _Mode)
 {
 	_pFile->ReadAll(_Mode);
+}
+void Lin::LReadFileAll(LFile* _pFile, vector<string>& _vector, ios_base::openmode _Mode)
+{
+	_pFile->ReadAll(_vector, _Mode);
 }

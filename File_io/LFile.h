@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include "Statement.h"
 #include "NoMemberFunction.h"
 
@@ -128,7 +129,7 @@ private:
 	/// <summary>
 	/// 记录当前读取到第几行
 	/// </summary>
-	static unsigned int g_len;
+	unsigned int m_thislen = 0;
 private:
 	LFile(const std::string& _FileName);
 	void* operator new(size_t _sz) { return ::operator new(_sz); }
@@ -140,7 +141,17 @@ private:
 	/// <param name="">文件读取的方式</param>
 	/// <returns>返回最后一个读取到的字符串</returns>
 	std::string Read(unsigned int _len, std::ios_base::openmode _Mode);
+	/// <summary>
+	/// 读取文件全部内容并使用cout打印
+	/// </summary>
+	/// <param name="_Mode"></param>
 	void ReadAll(std::ios_base::openmode _Mode);
+	/// <summary>
+	/// 将文件全部读取到list容器中
+	/// </summary>
+	/// <param name="">容器引用</param>
+	/// <param name=""></param>
+	void ReadAll(std::vector<std::string>&, std::ios_base::openmode);
 public:
 	static void BeginRead(LFile*, std::ios_base::openmode = std::ios::in);
 	static void BeginWrite(LFile*, std::ios_base::openmode = std::ios::out | std::ios::app);
@@ -164,5 +175,6 @@ public:
 	friend std::string Lin::LReadFileLine(Lin::LFile*, unsigned int, std::ios_base::openmode);
 	friend std::string Lin::LReadFileLinePlus(Lin::LFile*, unsigned int, std::ios_base::openmode);
 	friend void Lin::LReadFileAll(Lin::LFile*, std::ios_base::openmode);
+	friend void Lin::LReadFileAll(Lin::LFile*, std::vector<std::string>&, std::ios_base::openmode);
 };
 #pragma endregion
